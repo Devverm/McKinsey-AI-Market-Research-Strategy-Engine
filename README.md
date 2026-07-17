@@ -1,0 +1,1 @@
+# McKinsey-AI-Market-Research-Strategy-Engine
