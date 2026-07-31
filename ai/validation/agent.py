@@ -6,10 +6,15 @@ rule-based checks (credibility, recency, duplicates) from rules.py, then
 runs an LLM-based contradiction check across evidence that shares the same
 entity/topic -- the one check that genuinely needs semantic understanding
 rather than a fixed rule.
+
+A small delay is added between contradiction-check calls in run() to stay
+under the free-tier per-minute request quota (e.g. 15 RPM for
+gemini-3.5-flash-lite) when a job has several entity/topic groups to check.
 """
 
 from __future__ import annotations
 
+import time
 from collections import defaultdict
 
 from google import genai
@@ -21,6 +26,11 @@ from ai.validation.rules import apply_rule_based_checks
 from backend.core.config import settings
 
 DEFAULT_MODEL = settings.GEMINI_EXTRACTION_MODEL
+
+# Pause between per-group contradiction-check Gemini calls in run(). At
+# 4.5s/call, this keeps throughput at ~13 calls/minute, comfortably under
+# a 15 RPM free-tier cap.
+VALIDATION_CALL_DELAY_SECONDS = 4.5
 
 CONTRADICTION_SYSTEM_PROMPT = """You are the Validation Agent's contradiction
 checker inside a McKinsey-style AI market research system. You will be given
@@ -73,7 +83,9 @@ class ValidationAgent:
                 flagged_ids.add(group[idx].evidence_id)
         return flagged_ids
 
-    def _group_by_entity_topic(self, evidence_list: list[EvidenceRecord]) -> dict[tuple, list[EvidenceRecord]]:
+    def _group_by_entity_topic(
+        self, evidence_list: list[EvidenceRecord]
+    ) -> dict[tuple, list[EvidenceRecord]]:
         groups: dict[tuple, list[EvidenceRecord]] = defaultdict(list)
         for e in evidence_list:
             key = ((e.entity or "").lower().strip(), (e.topic or "").lower().strip())
@@ -95,6 +107,7 @@ class ValidationAgent:
         contradicted_ids: set[str] = set()
         for group in groups.values():
             contradicted_ids |= self._check_group_for_contradictions(group)
+            time.sleep(VALIDATION_CALL_DELAY_SECONDS)
 
         for e in evidence_list:
             if e.evidence_id in contradicted_ids:

@@ -1,14 +1,9 @@
 {
   "pages": {
-    "/jobs/[jobId]/report/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/jobs/[jobId]/report/page.js"
-    ],
-    "/jobs/[jobId]/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/jobs/[jobId]/layout.js"
+      "static/chunks/app/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -16,10 +11,30 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
+    "/jobs/[jobId]/monitor/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/jobs/[jobId]/monitor/page.js"
+    ],
+    "/jobs/[jobId]/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/jobs/[jobId]/layout.js"
+    ],
+    "/jobs/[jobId]/plan/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/jobs/[jobId]/plan/page.js"
+    ],
+    "/jobs/[jobId]/report/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/jobs/[jobId]/report/page.js"
+    ],
+    "/jobs/[jobId]/evidence/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/jobs/[jobId]/evidence/page.js"
     ]
   }
 }
